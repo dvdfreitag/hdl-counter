@@ -5,10 +5,14 @@ module test;
 
 	initial begin
 		string dumpfile;
-		$value$plusargs("DUMPFILE=%s", dumpfile);
+
+		if (!$value$plusargs("DUMPFILE=%s", dumpfile)) begin
+			$fatal(1, "ERROR: No dumpfile supplied, please use +DUMPFILE=<dumpfile>");
+		end
+
 		$dumpfile(dumpfile);
 		$dumpvars(0, test);
-
+		
 		# 17 reset = 1;
 		# 11 reset = 0;
 		# 29 reset = 1;

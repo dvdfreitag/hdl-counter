@@ -1,6 +1,6 @@
 PROJ := counter
-SRCS := counter.v
-BENCH := counter.tb.v
+SRCS := $(wildcard *.v)
+TBS := $(wildcard *.tb.v)
 DUMPFILE := $(addsuffix .vcd, $(PROJ))
 WAVEFILE := $(addsuffix .dsn, $(PROJ))
 
@@ -11,14 +11,16 @@ VVP := vvp
 VVFLAGS := +DUMPFILE="$(DUMPFILE)"
 
 %.dsn: %.v
-	$(IVERILOG) $(IVFLAGS) -o "$@" "$<" $(BENCH)
+	$(IVERILOG) $(IVFLAGS) -o $@ $^
 
 %.vcd: %.dsn
-	$(VVP) "$<" $(VVFLAGS)
+	$(VVP) $< $(VVFLAGS)
 
 .PHONY: clean
 
 $(DUMPFILE): $(WAVEFILE)
+
+$(WAVEFILE): $(SRCS) $(TBS)
 
 clean:
 	@rm -f *.dsn *.vcd
