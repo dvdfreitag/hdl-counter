@@ -1,20 +1,21 @@
-module counter(out, clk, reset);
+module counter(out, clk, reset, enable);
 
   	parameter WIDTH = 8;
 
   	output [WIDTH - 1 : 0] out;
-  	input clk, reset;
+  	input clk, reset, enable;
 
-  	reg [WIDTH - 1 : 0] out;
-  	wire clk, reset;
+  	reg [WIDTH - 1 : 0] out = 0;
+  	wire clk, reset, enable;
 
-  	always @(posedge clk)
-		out <= out + 1;
+  	always @(posedge clk) begin
+		if (reset && enable) begin
+		  	out <= out + 1;
+		end
+	end
 
-  	always @reset
-		if (reset)
-		  	assign out = 0;
-		else
-		  	deassign out;
-
+  	always @(negedge reset) begin
+		out <= 0;
+	end
+	
 endmodule

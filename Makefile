@@ -16,11 +16,14 @@ VVFLAGS := +DUMPFILE="$(DUMPFILE)"
 %.vcd: %.dsn
 	$(VVP) $< $(VVFLAGS)
 
-.PHONY: clean
+.PHONY: clean, wave
 
 $(DUMPFILE): $(WAVEFILE)
 
 $(WAVEFILE): $(SRCS) $(TBS)
+
+wave: $(DUMPFILE)
+	gtkwave $< &
 
 clean:
 	@rm -f *.dsn *.vcd
