@@ -1,47 +1,53 @@
-module counter(out, clk, reset, enable, period, control);
-
+module counter(clk, reset, enable, period, slope, out);
+	enum { init = 0, up = 1, down = 2 } states;
   	parameter WIDTH = 8;
 
-  	output [WIDTH - 1 : 0] out;
+	output out;
 	input [WIDTH - 1 : 0] period;
-	input [7 : 0] control;
-  	input clk, reset, enable;
+	input clk, reset, enable, slope;
 
-  	reg [WIDTH - 1 : 0] out = 0;
-	reg [7 : 0] status = 0;
-  	wire clk, reset, enable;
+  	reg [WIDTH - 1 : 0] count = 0;
+	reg [1:0] state = init;
+  	wire clk, reset, enable, slope;
+	reg out = 0;
 
   	always @(posedge clk) begin
-		if (reset && enable) begin
-			if ((status & 1) == 1) begin
-				if ((control & 1) == 1) begin
-					if (out == 1) begin
-						out <= out - 1;
-						status <= status & ~1;
+	  	if (reset == 0) begin
+			count <= 0;
+			state <= init;
+		end
+
+		if (enable == 0) begin
+			case (state)
+				init: begin
+					count <= 0;
+					state <= up;
+				end
+				up: begin
+					if ((count == (period - 1)) && (slope == 0)) begin
+						count <= count + 1;
+						state <= init;
+						out <= !out;
+					end
+					else if ((count == (period - 1)) && (slope == 1)) begin
+						count <= count + 1;
+						state <= down;
+						out <= !out;
 					end
 					else begin
-						out <= out - 1;
+						count <= count + 1;
 					end
 				end
-				else begin
-					out <= 0;
-					status <= status & ~1;
+				down: begin
+					if (count == 1) begin
+						count <= count - 1;
+						state <= up;
+					end
+					else begin
+						count <= count - 1;
+					end
 				end
-			end
-			else begin
-				if (out == (period - 1)) begin
-					out <= out +1;
-					status <= status | 1;
-				end
-				else begin
-					out <= out + 1;
-				end
-			end
+			endcase
 		end
 	end
-
-  	always @(negedge reset) begin
-		out <= 0;
-	end
-	
 endmodule

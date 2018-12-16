@@ -1,8 +1,10 @@
 module test;
-
-	// Make a reset that pulses once.
+	reg clk = 0;
 	reg reset = 0;
-	reg enable = 0;
+	reg enable = 1;
+	reg [7:0] period = 'h0A;
+	reg slope = 1;
+	wire out;
 
 	initial begin
 		string dumpfile;
@@ -14,29 +16,22 @@ module test;
 		$dumpfile(dumpfile);
 		$dumpvars(0, test);
 		
-		# 14 reset = 0;
-		# 11 reset = 1;
-		# 5 enable = 1;
-		# 19 enable = 0;
-		# 5 reset = 0;
-		# 5  reset = 1;
-		# 29 enable = 1;
+		# 14 reset  = 0;
+		# 11 reset  = 1;
+		# 5  enable = 0;
+		# 19 enable = 1;
+		# 5  reset  = 0;
+		# 5  reset  = 1;
 		# 29 enable = 0;
 		# 29 enable = 1;
-		# 480 $finish;
+		# 29 enable = 0;
+		# 29 slope  = 1;
+		# 65 slope  = 0;
+		# 0 period  = 'hBD;
+		# 422 $finish;
 	end
 
-	// Make a regular pulsing clock.
-	reg clk = 0;
 	always #1 clk = !clk;
 
-	wire [7:0] value;
-	reg [7:0] period = 'h0A;
-	reg [7:0] control = 'h01;
-	counter c1 (value, clk, reset, enable, period, control);
-
-	initial begin
-		$monitor("At time %t, value = %h (%0d)", $time, value, value);
-	end
-
+	counter c1 (clk, reset, enable, period, slope, out);
 endmodule
