@@ -31,7 +31,9 @@ module test;
 	always #1 clk = !clk;
 
 	wire [7:0] value;
-	counter c1 (value, clk, reset, enable);
+	reg [7:0] period = 'h0A;
+	reg [7:0] control = 'h01;
+	counter c1 (value, clk, reset, enable, period, control);
 
 	initial begin
 		$monitor("At time %t, value = %h (%0d)", $time, value, value);
